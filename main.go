@@ -40,7 +40,7 @@ const htmlTemplate = `
 <body>
 <div class="container">
     <h1>CSP Reports for {{.RootDomain}}</h1>
-	<a href="/static"><div class="menu">Back</div></a>
+	<a href="/"><div class="menu">Back</div></a>
     {{range $index, $report := .Reports}}
     <div class="report">
         <button class="collapsible">Report #{{add1 $index}}: {{$report.DocumentURI}}</button>
@@ -76,14 +76,13 @@ const landingPageTemplate = `
     <h1>CSP Reports for efelle creative</h1>
 	<div class="search"><input type="text" id="searchInput" onkeyup="filterList()" placeholder="Search for domains."></div>
     <ul id="rootDomainList">
-    {{range .RootDomains}}
-	<li>
-	<div class="domain-list">
-        <p><a href="{{.}}_csp.html">{{.}}</a></p>
-	</div>
-	</li>
-    {{end}}
-    </ul>
+{{range $index, $rootDomain := .RootDomains}}
+    <li id="site-{{$index}}">
+        <a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
+        <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button>
+    </li>
+{{end}}
+</ul>
 </div>
 <script src="scripts.js"></script>
 </body>
@@ -93,6 +92,7 @@ const landingPageTemplate = `
 func main() {
 	http.HandleFunc("/csp-report", cspReportHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/delete-site", deleteSiteHandler)
 
 	log.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -100,6 +100,40 @@ func main() {
 	}
 }
 
+func deleteSiteHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	rootDomain := r.URL.Query().Get("rootDomain")
+	if rootDomain == "" {
+		http.Error(w, "Root domain is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := deleteSiteFiles(rootDomain); err != nil {
+		http.Error(w, "Error deleting site files", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func deleteSiteFiles(rootDomain string) error {
+	htmlFilePath := filepath.Join("static", rootDomain+"_csp.html")
+	jsonFilePath := filepath.Join("static", rootDomain+".html")
+
+	if err := os.Remove(htmlFilePath); err != nil {
+		return err
+	}
+
+	if err := os.Remove(jsonFilePath); err != nil {
+		return err
+	}
+
+	return nil
+}
 func updateLandingPage(rootDomains []string) error {
 	tmpl, err := template.New("landing").Parse(landingPageTemplate)
 	if err != nil {

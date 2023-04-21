@@ -11,7 +11,30 @@ for (i = 0; i < coll.length; i++) {
         }
     });
 }
-
+function deleteSite(rootDomain, liId) {
+    if (!confirm('Are you sure you want to delete this site and its related files?')) {
+      return;
+    }
+  
+    fetch('/delete-site?rootDomain=' + encodeURIComponent(rootDomain), {
+      method: 'POST'
+    })
+    .then(response => {
+      if (response.ok) {
+        // Remove the list item from the page
+        const listItem = document.getElementById(liId);
+        if (listItem) {
+          listItem.remove();
+        }
+      } else {
+        alert('Error deleting site. Please try again.');
+      }
+    })
+    .catch(error => {
+      alert('Error deleting site. Please try again.');
+    });
+  }
+  
 function filterList() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toUpperCase();
