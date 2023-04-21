@@ -80,8 +80,8 @@ const landingPageTemplate = `
 {{range $index, $rootDomain := .RootDomains}}
 	<div class="domain-list">    
 		<li id="site-{{$index}}">
-        <a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
-        <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button>
+        <p><a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
+        <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button></p>
     	</li>
 	</div>
 	{{end}}
