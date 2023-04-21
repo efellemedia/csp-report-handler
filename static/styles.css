@@ -60,6 +60,15 @@ h1 {
     border-radius:15px;
 }
 
+.domain-list button {
+    float:right;
+    display:block;
+    background-color:#242323;
+    color:#ccc;
+    font-weight:bold;
+    padding: 4px;
+}
+
 li {
     list-style:none;
 }

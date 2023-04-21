@@ -75,14 +75,16 @@ const landingPageTemplate = `
 <div class="container">
     <h1>CSP Reports for efelle creative</h1>
 	<div class="search"><input type="text" id="searchInput" onkeyup="filterList()" placeholder="Search for domains."></div>
-    <ul id="rootDomainList">
+    <div class="domain-list">
+	<ul id="rootDomainList">
 {{range $index, $rootDomain := .RootDomains}}
     <li id="site-{{$index}}">
         <a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
         <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button>
     </li>
 {{end}}
-</ul>
+	</ul>
+	</div>
 </div>
 <script src="scripts.js"></script>
 </body>
