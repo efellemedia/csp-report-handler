@@ -49,28 +49,31 @@ h1 {
     overflow: hidden;
     background-color: #524d4d;
 }
+.domain-list ul {
+    margin:2% auto;
+
+}
 .domain-list {
     margin:2% auto;
     padding-left:5%;
-    margin:auto;
     list-style: none;
     font-weight:bold;
     border: 1px dashed black;
     background-color:#242323;
     border-radius:15px;
+    height:10%;
 }
 
 .domain-list button {
-    float:right;
     display:block;
     background-color:#242323;
     color:#ccc;
     font-weight:bold;
-    margin: 2px; 
 }
 
 li {
     list-style:none;
+    height:100%;
 }
 
 .search {
