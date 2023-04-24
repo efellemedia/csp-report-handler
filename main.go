@@ -74,19 +74,17 @@ const landingPageTemplate = `
 <body>
 <div class="container">
     <h1>CSP Reports for efelle creative</h1>
-	<div class="search"><input type="text" id="searchInput" onkeyup="filterList()" placeholder="Search for domains."></div>
+    <div class="search"><input type="text" id="searchInput" onkeyup="filterList()" placeholder="Search for domains."></div>
     <div class="domain-list">
-	<ul id="rootDomainList">
+        <div id="rootDomainList">
 {{range $index, $rootDomain := .RootDomains}}
-	<div class="domain-list">    
-		<li id="site-{{$index}}">
-        <p><a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
-        <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button></p>
-    	</li>
-	</div>
-	{{end}}
-	</ul>
-	
+            <div class="domain-list-item" id="site-{{$index}}">    
+                <a href="{{$rootDomain}}_csp.html">{{$rootDomain}}</a>
+                <button class="delete-button" onclick="deleteSite('{{$rootDomain}}', 'site-{{$index}}')">Delete</button>
+            </div>
+{{end}}
+        </div>
+    </div>
 </div>
 <script src="scripts.js"></script>
 </body>
@@ -105,19 +103,23 @@ func main() {
 }
 
 func deleteSiteHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	rootDomain := r.URL.Query().Get("rootDomain")
 	if rootDomain == "" {
-		http.Error(w, "Root domain is required", http.StatusBadRequest)
+		http.Error(w, "Root domain parameter is missing", http.StatusBadRequest)
 		return
 	}
 
 	if err := deleteSiteFiles(rootDomain); err != nil {
 		http.Error(w, "Error deleting site files", http.StatusInternalServerError)
+		return
+	}
+
+	// Get updated list of root domains
+	rootDomains := getRootDomains("static")
+
+	// Update index.html file after deleting the site's files
+	if err := updateLandingPage(rootDomains); err != nil {
+		http.Error(w, "Error updating index file", http.StatusInternalServerError)
 		return
 	}
 
